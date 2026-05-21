@@ -134,8 +134,9 @@ export default function TechnicianPage() {
     if (!error && data) {
 
       setProjects(
-        data as AssignedProject[]
-      );
+  (data ||
+    []) as unknown as AssignedProject[]
+);
     }
 
     setLoading(false);
