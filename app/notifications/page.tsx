@@ -32,7 +32,7 @@ export default function NotificationsPage() {
   >([]);
 
   const [role, setRole] =
-    useState("");
+  useState<"admin" | "technician" | "client">("client");
 
   const [loading, setLoading] =
     useState(true);
