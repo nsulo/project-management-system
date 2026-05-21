@@ -156,7 +156,14 @@ export default function NotificationsPage() {
   return (
     <div className="flex">
 
-      <Sidebar role={role} />
+      <Sidebar
+  role={
+    role as
+      | "admin"
+      | "technician"
+      | "client"
+  }
+/>
 
       <main className="flex-1 min-h-screen bg-gray-100 p-6 md:p-10 pt-24 md:pt-10">
 
