@@ -22,6 +22,11 @@ type NotificationType = {
   created_at: string;
 };
 
+type UserRole =
+  | "admin"
+  | "technician"
+  | "client";
+
 export default function NotificationsPage() {
 
   const [
@@ -32,7 +37,9 @@ export default function NotificationsPage() {
   >([]);
 
   const [role, setRole] =
-  useState<"admin" | "technician" | "client">("client");
+    useState<UserRole>(
+      "client"
+    );
 
   const [loading, setLoading] =
     useState(true);
@@ -76,7 +83,12 @@ export default function NotificationsPage() {
     } =
       await supabase.auth.getUser();
 
-    if (!user) return;
+    if (!user) {
+
+      setLoading(false);
+
+      return;
+    }
 
     const {
       data: profile,
@@ -86,9 +98,19 @@ export default function NotificationsPage() {
       .eq("id", user.id)
       .single();
 
-    setRole(
-      profile?.role || ""
-    );
+    if (
+      profile?.role ===
+        "admin" ||
+      profile?.role ===
+        "technician" ||
+      profile?.role ===
+        "client"
+    ) {
+
+      setRole(
+        profile.role
+      );
+    }
 
     const { data, error } =
       await supabase
@@ -157,13 +179,8 @@ export default function NotificationsPage() {
     <div className="flex">
 
       <Sidebar
-  role={
-    role as
-      | "admin"
-      | "technician"
-      | "client"
-  }
-/>
+        role={role}
+      />
 
       <main className="flex-1 min-h-screen bg-gray-100 p-6 md:p-10 pt-24 md:pt-10">
 
