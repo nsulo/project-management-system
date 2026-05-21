@@ -107,9 +107,19 @@ export default function NotificationsPage() {
         "client"
     ) {
 
-      setRole(
-        profile.role
-      );
+      if (
+  profile?.role ===
+    "admin" ||
+  profile?.role ===
+    "technician" ||
+  profile?.role ===
+    "client"
+) {
+
+  setRole(
+    profile.role
+  );
+}
     }
 
     const { data, error } =
