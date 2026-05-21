@@ -211,7 +211,7 @@ export default function AssignmentsPage() {
     }
 
     setAssignments(
-      data as AssignmentType[]
+      (data || []) as unknown as AssignmentType[]
     );
 
     setLoading(false);
