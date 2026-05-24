@@ -231,17 +231,10 @@ export default function Sidebar({
 
         <div className="flex items-center gap-3">
 
-          {/* <Image
-            src="/logo.jpeg"
-            alt="ADE Logo"
-            width={40}
-            height={40}
-            className="rounded-lg"
-          /> */}
-
+          
           <h2 className="text-lg font-bold text-blue-600">
 
-            ADE PMS
+            ADE PMP
 
           </h2>
 
