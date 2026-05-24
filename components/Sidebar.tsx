@@ -232,7 +232,7 @@ export default function Sidebar({
         <div className="flex items-center gap-3">
 
           <Image
-            src="/logo.png"
+            src="/logo.jpeg"
             alt="ADE Logo"
             width={40}
             height={40}

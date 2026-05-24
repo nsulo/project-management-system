@@ -123,7 +123,7 @@ export default function LoginPage() {
          <div className="flex justify-center mb-6">
 
   <Image
-    src="/logo.jpg"
+    src="/logo.jpeg"
     alt="Ardent Digital Engineering"
     width={180}
     height={180}
