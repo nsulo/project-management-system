@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 
 import { useState } from "react";
 
@@ -10,8 +11,7 @@ import { getCurrentUserRole } from "@/services/user";
 
 export default function LoginPage() {
 
-  const router =
-    useRouter();
+  const router = useRouter();
 
   const [email, setEmail] =
     useState("");
@@ -28,76 +28,89 @@ export default function LoginPage() {
 
     e.preventDefault();
 
-    setLoading(true);
+    try {
 
-    const { error } =
-      await signIn(
-        email,
-        password
-      );
+      setLoading(true);
 
-    if (error) {
+      const { error } =
+        await signIn(
+          email,
+          password
+        );
 
-      alert(error.message);
+      if (error) {
 
-      setLoading(false);
+        alert(error.message);
 
-      return;
-    }
+        return;
+      }
 
-    const role =
-      await getCurrentUserRole();
-
-    console.log(
-      "ROLE FROM DB:",
-      role
-    );
-
-    if (!role) {
-
-      alert(
-        "No role assigned"
-      );
-
-      setLoading(false);
-
-      return;
-    }
-
-    if (role === "admin") {
-
-      router.push("/admin");
-    }
-
-    else if (
-      role === "technician"
-    ) {
-
-      router.push(
-        "/technician"
-      );
-    }
-
-    else if (
-      role === "client"
-    ) {
-
-      router.push("/client");
-    }
-
-    else {
+      const role =
+        await getCurrentUserRole();
 
       console.log(
-        "INVALID ROLE:",
+        "ROLE FROM DB:",
         role
       );
 
+      if (!role) {
+
+        alert(
+          "No role assigned"
+        );
+
+        return;
+      }
+
+      switch (role) {
+
+        case "admin":
+
+          router.push("/admin");
+
+          break;
+
+        case "technician":
+
+          router.push(
+            "/technician"
+          );
+
+          break;
+
+        case "client":
+
+          router.push("/client");
+
+          break;
+
+        default:
+
+          console.log(
+            "INVALID ROLE:",
+            role
+          );
+
+          alert(
+            "Invalid role detected"
+          );
+      }
+
+    }
+
+    catch (err) {
+
+      console.error(err);
+
       alert(
-        "Invalid role detected"
+        "Login failed"
       );
     }
 
-    setLoading(false);
+    finally {
+
+      setLoading(false);
+    }
   }
 
   return (
@@ -107,7 +120,18 @@ export default function LoginPage() {
         onSubmit={handleLogin}
         className="bg-white p-8 rounded-2xl shadow-md w-full max-w-md"
       >
+         <div className="flex justify-center mb-6">
 
+  <Image
+    src="/logo.jpg"
+    alt="Ardent Digital Engineering"
+    width={180}
+    height={180}
+    className="rounded-xl"
+    priority
+  />
+
+</div>
         <h1 className="text-3xl font-bold mb-2 text-center text-blue-600">
 
           Login

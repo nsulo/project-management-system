@@ -1,5 +1,5 @@
 "use client";
-
+import Image from "next/image";
 import {
   useEffect,
   useState,
@@ -230,7 +230,18 @@ export default function Sidebar({
 
         <h2 className="text-xl font-bold text-blue-600">
 
-          PMS System
+          <div className="flex flex-col items-center mb-8">
+
+  <Image
+    src="/logo.jpg"
+    alt="Ardent Digital Engineering"
+    width={160}
+    height={160}
+    className="rounded-xl"
+    priority
+  />
+
+</div>
 
         </h2>
 
