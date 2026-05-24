@@ -1,4 +1,5 @@
 "use client";
+
 import Image from "next/image";
 import {
   useEffect,
@@ -228,22 +229,23 @@ export default function Sidebar({
 
       <div className="md:hidden fixed top-0 left-0 right-0 bg-white shadow z-50 flex items-center justify-between p-4">
 
-        <h2 className="text-xl font-bold text-blue-600">
+        <div className="flex items-center gap-3">
 
-          <div className="flex flex-col items-center mb-8">
+          <Image
+            src="/logo.png"
+            alt="ADE Logo"
+            width={40}
+            height={40}
+            className="rounded-lg"
+          />
 
-  <Image
-    src="/logo.jpg"
-    alt="Ardent Digital Engineering"
-    width={160}
-    height={160}
-    className="rounded-xl"
-    priority
-  />
+          <h2 className="text-lg font-bold text-blue-600">
 
-</div>
+            ADE PMS
 
-        </h2>
+          </h2>
+
+        </div>
 
         <button
           onClick={() =>
@@ -288,11 +290,32 @@ export default function Sidebar({
         `}
       >
 
-        <h2 className="text-3xl font-extrabold text-blue-600 mb-10 mt-10 md:mt-0">
+        {/* Logo Section */}
 
-          PMS System
+        <div className="flex flex-col items-center mb-10 mt-10 md:mt-0">
 
-        </h2>
+          <Image
+            src="/logo.png"
+            alt="ADE Logo"
+            width={120}
+            height={120}
+            className="rounded-2xl shadow-md"
+            priority
+          />
+
+          <h2 className="text-2xl font-extrabold text-blue-600 mt-4 text-center">
+
+            ADE PMS
+
+          </h2>
+
+          <p className="text-gray-500 text-sm text-center">
+
+            Project Management System
+
+          </p>
+
+        </div>
 
         <nav className="space-y-3">
 
