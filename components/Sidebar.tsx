@@ -1,6 +1,6 @@
 "use client";
+//import Image from "next/image";
 
-import Image from "next/image";
 import {
   useEffect,
   useState,
@@ -287,16 +287,7 @@ export default function Sidebar({
 
         <div className="flex flex-col items-center mb-10 mt-10 md:mt-0">
 
-          <Image
-            src="/logo.png"
-            alt="ADE Logo"
-            width={120}
-            height={120}
-            className="rounded-2xl shadow-md"
-            priority
-          />
-
-          <h2 className="text-2xl font-extrabold text-blue-600 mt-4 text-center">
+                   <h2 className="text-2xl font-extrabold text-blue-600 mt-4 text-center">
 
             ADE PMS
 
