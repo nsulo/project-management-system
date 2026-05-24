@@ -289,7 +289,7 @@ export default function Sidebar({
 
                    <h2 className="text-2xl font-extrabold text-blue-600 mt-4 text-center">
 
-            ADE PMS
+            ADE PMP
 
           </h2>
 
