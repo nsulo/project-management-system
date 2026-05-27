@@ -1,17 +1,12 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export function proxy(
+export function middleware(
   request: NextRequest
 ) {
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: [
-    "/admin/:path*",
-    "/technician/:path*",
-    "/client/:path*",
-    "/settings/:path*",
-  ],
+  matcher: [],
 };
