@@ -6,11 +6,6 @@ export function middleware(
   request: NextRequest
 ) {
 
-  const accessToken =
-    request.cookies.get(
-      "sb-access-token"
-    );
-
   const role =
     request.cookies.get(
       "user-role"
@@ -27,18 +22,6 @@ export function middleware(
   ) {
 
     return NextResponse.next();
-  }
-
-  // Not logged in
-
-  if (!accessToken) {
-
-    return NextResponse.redirect(
-      new URL(
-        "/login",
-        request.url
-      )
-    );
   }
 
   // Admin routes
