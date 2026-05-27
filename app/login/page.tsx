@@ -1,12 +1,10 @@
 "use client";
+
 import Image from "next/image";
-
 import { useState } from "react";
-
 import { useRouter } from "next/navigation";
 
 import { signIn } from "@/services/auth";
-
 import { getCurrentUserRole } from "@/services/user";
 
 export default function LoginPage() {
@@ -61,6 +59,10 @@ export default function LoginPage() {
 
         return;
       }
+
+      // SAVE ROLE IN COOKIE
+      document.cookie =
+        `user-role=${role}; path=/`;
 
       switch (role) {
 
@@ -120,18 +122,20 @@ export default function LoginPage() {
         onSubmit={handleLogin}
         className="bg-white p-8 rounded-2xl shadow-md w-full max-w-md"
       >
-         <div className="flex justify-center mb-6">
 
-  <Image
-    src="/logo.jpeg"
-    alt="Ardent Digital Engineering"
-    width={180}
-    height={180}
-    className="rounded-xl"
-    priority
-  />
+        <div className="flex justify-center mb-6">
 
-</div>
+          <Image
+            src="/logo.jpeg"
+            alt="Ardent Digital Engineering"
+            width={180}
+            height={180}
+            className="rounded-xl"
+            priority
+          />
+
+        </div>
+
         <h1 className="text-3xl font-bold mb-2 text-center text-blue-600">
 
           Login
