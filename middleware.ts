@@ -11,10 +11,15 @@ export function middleware(
       "sb-access-token"
     );
 
+  const role =
+    request.cookies.get(
+      "user-role"
+    )?.value;
+
   const pathname =
     request.nextUrl.pathname;
 
-  // Allow public pages
+  // Public routes
 
   if (
     pathname === "/" ||
@@ -24,9 +29,60 @@ export function middleware(
     return NextResponse.next();
   }
 
-  // Redirect if not logged in
+  // Not logged in
 
   if (!accessToken) {
+
+    return NextResponse.redirect(
+      new URL(
+        "/login",
+        request.url
+      )
+    );
+  }
+
+  // Admin routes
+
+  if (
+    pathname.startsWith(
+      "/admin"
+    ) &&
+    role !== "admin"
+  ) {
+
+    return NextResponse.redirect(
+      new URL(
+        "/login",
+        request.url
+      )
+    );
+  }
+
+  // Technician routes
+
+  if (
+    pathname.startsWith(
+      "/technician"
+    ) &&
+    role !== "technician"
+  ) {
+
+    return NextResponse.redirect(
+      new URL(
+        "/login",
+        request.url
+      )
+    );
+  }
+
+  // Client routes
+
+  if (
+    pathname.startsWith(
+      "/client"
+    ) &&
+    role !== "client"
+  ) {
 
     return NextResponse.redirect(
       new URL(
