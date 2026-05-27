@@ -40,8 +40,16 @@ export default function LoginPage() {
 
         alert(error.message);
 
+        setLoading(false);
+
         return;
       }
+
+      // WAIT FOR SESSION TO FINISH SAVING
+      await new Promise(
+        (resolve) =>
+          setTimeout(resolve, 1000)
+      );
 
       const role =
         await getCurrentUserRole();
@@ -57,45 +65,48 @@ export default function LoginPage() {
           "No role assigned"
         );
 
+        setLoading(false);
+
         return;
       }
 
-      // SAVE ROLE IN COOKIE
+      // SAVE ROLE COOKIE
       document.cookie =
         `user-role=${role}; path=/`;
 
-      switch (role) {
+      // FORCE FULL PAGE NAVIGATION
+      if (role === "admin") {
 
-        case "admin":
+        window.location.href =
+          "/admin";
+      }
 
-          router.push("/admin");
+      else if (
+        role === "technician"
+      ) {
 
-          break;
+        window.location.href =
+          "/technician";
+      }
 
-        case "technician":
+      else if (
+        role === "client"
+      ) {
 
-          router.push(
-            "/technician"
-          );
+        window.location.href =
+          "/client";
+      }
 
-          break;
+      else {
 
-        case "client":
+        console.log(
+          "INVALID ROLE:",
+          role
+        );
 
-          router.push("/client");
-
-          break;
-
-        default:
-
-          console.log(
-            "INVALID ROLE:",
-            role
-          );
-
-          alert(
-            "Invalid role detected"
-          );
+        alert(
+          "Invalid role detected"
+        );
       }
 
     }
