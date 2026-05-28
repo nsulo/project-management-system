@@ -25,6 +25,7 @@ import {
   Wrench,
   ClipboardCheck,
   FileText,
+  Activity,
 } from "lucide-react";
 
 import Sidebar from "@/components/Sidebar";
@@ -69,6 +70,11 @@ export default function AdminDashboard() {
     setStatusData,
   ] = useState<any[]>([]);
 
+  const [
+    recentProjects,
+    setRecentProjects,
+  ] = useState<any[]>([]);
+
   useEffect(() => {
 
     async function protectPage() {
@@ -78,7 +84,7 @@ export default function AdminDashboard() {
 
       if (!allowed) {
 
-        router.push("/");
+        router.push("/login");
 
         return;
       }
@@ -145,7 +151,11 @@ export default function AdminDashboard() {
       data: projectsData,
     } = await supabase
       .from("projects")
-      .select("*");
+      .select("*")
+      .order(
+        "created_at",
+        { ascending: false }
+      );
 
     const {
       data: profilesData,
@@ -196,6 +206,10 @@ export default function AdminDashboard() {
       completed:
         completedProjects,
     });
+
+    setRecentProjects(
+      allProjects.slice(0, 5)
+    );
 
     const groupedMonths: any =
       {};
@@ -284,7 +298,9 @@ export default function AdminDashboard() {
 
       <main className="flex-1 min-h-screen bg-gray-100 p-6 md:p-10 pt-24 md:pt-10">
 
-        <div className="flex justify-between items-center mb-8">
+        {/* HEADER */}
+
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
 
           <div>
 
@@ -296,15 +312,35 @@ export default function AdminDashboard() {
 
             <p className="text-gray-600 mt-2">
 
-              Monitor projects, reports and workforce activity
+              Welcome back to ADE Project Management System
 
             </p>
 
           </div>
 
-          <LogoutButton />
+          <div className="flex items-center gap-4">
+
+            <div className="bg-white px-5 py-3 rounded-xl shadow text-sm text-gray-600">
+
+              {new Date().toLocaleDateString(
+                "en-US",
+                {
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                }
+              )}
+
+            </div>
+
+            <LogoutButton />
+
+          </div>
 
         </div>
+
+        {/* STATS */}
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6 mb-10">
 
@@ -362,7 +398,9 @@ export default function AdminDashboard() {
 
         </div>
 
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+        {/* CHARTS */}
+
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-10">
 
           <div className="bg-white p-6 rounded-2xl shadow">
 
@@ -474,6 +512,93 @@ export default function AdminDashboard() {
 
         </div>
 
+        {/* RECENT PROJECTS */}
+
+        <div className="bg-white rounded-2xl shadow p-6">
+
+          <div className="flex items-center gap-3 mb-6">
+
+            <Activity className="text-blue-600" />
+
+            <h2 className="text-2xl font-bold text-blue-600">
+
+              Recent Projects
+
+            </h2>
+
+          </div>
+
+          <div className="overflow-x-auto">
+
+            <table className="w-full">
+
+              <thead>
+
+                <tr className="border-b text-left">
+
+                  <th className="pb-3">
+                    Project
+                  </th>
+
+                  <th className="pb-3">
+                    Status
+                  </th>
+
+                  <th className="pb-3">
+                    Created
+                  </th>
+
+                </tr>
+
+              </thead>
+
+              <tbody>
+
+                {recentProjects.map(
+                  (project) => (
+
+                    <tr
+                      key={project.id}
+                      className="border-b hover:bg-gray-50 transition"
+                    >
+
+                      <td className="py-4 font-medium">
+
+                        {project.title}
+
+                      </td>
+
+                      <td className="py-4">
+
+                        <span className="px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-700">
+
+                          {project.status}
+
+                        </span>
+
+                      </td>
+
+                      <td className="py-4 text-gray-500">
+
+                        {new Date(
+                          project.created_at
+                        ).toLocaleDateString()}
+
+                      </td>
+
+                    </tr>
+
+                  )
+                )}
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
       </main>
 
     </div>
@@ -487,7 +612,7 @@ function DashboardCard({
 }: any) {
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow">
+    <div className="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition-all">
 
       <div className="flex items-center justify-between mb-4">
 
@@ -495,7 +620,7 @@ function DashboardCard({
           {icon}
         </div>
 
-        <h2 className="text-4xl font-bold">
+        <h2 className="text-4xl font-bold text-gray-800">
 
           {value}
 
@@ -503,7 +628,7 @@ function DashboardCard({
 
       </div>
 
-      <p className="text-gray-600">
+      <p className="text-gray-600 font-medium">
 
         {title}
 
