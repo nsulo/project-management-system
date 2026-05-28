@@ -12,7 +12,18 @@ import {
   CheckCircle2,
   AlertCircle,
   Activity,
+  TrendingUp,
+  CalendarDays,
+  Sparkles,
 } from "lucide-react";
+
+import {
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+} from "recharts";
 
 import { supabase } from "@/lib/supabase";
 
@@ -30,6 +41,13 @@ type ProjectType = {
   created_at: string;
 };
 
+const COLORS = [
+  "#9333ea",
+  "#eab308",
+  "#16a34a",
+  "#dc2626",
+];
+
 export default function ClientPage() {
 
   const [projects, setProjects] =
@@ -44,7 +62,13 @@ export default function ClientPage() {
       completed: 0,
       inProgress: 0,
       pending: 0,
+      onHold: 0,
     });
+
+  const [
+    chartData,
+    setChartData,
+  ] = useState<any[]>([]);
 
   useEffect(() => {
 
@@ -119,31 +143,61 @@ export default function ClientPage() {
 
     setProjects(projectsData);
 
+    const completed =
+      projectsData.filter(
+        (p) =>
+          p.status ===
+          "Completed"
+      ).length;
+
+    const inProgress =
+      projectsData.filter(
+        (p) =>
+          p.status ===
+          "In Progress"
+      ).length;
+
+    const pending =
+      projectsData.filter(
+        (p) =>
+          p.status ===
+          "Pending"
+      ).length;
+
+    const onHold =
+      projectsData.filter(
+        (p) =>
+          p.status ===
+          "On Hold"
+      ).length;
+
     setStats({
       total:
         projectsData.length,
-
-      completed:
-        projectsData.filter(
-          (p) =>
-            p.status ===
-            "Completed"
-        ).length,
-
-      inProgress:
-        projectsData.filter(
-          (p) =>
-            p.status ===
-            "In Progress"
-        ).length,
-
-      pending:
-        projectsData.filter(
-          (p) =>
-            p.status ===
-            "Pending"
-        ).length,
+      completed,
+      inProgress,
+      pending,
+      onHold,
     });
+
+    setChartData([
+      {
+        name: "Completed",
+        value: completed,
+      },
+      {
+        name: "In Progress",
+        value: inProgress,
+      },
+      {
+        name: "Pending",
+        value: pending,
+      },
+      {
+        name: "On Hold",
+        value: onHold,
+      },
+    ]);
 
     setLoading(false);
   }
@@ -156,19 +210,19 @@ export default function ClientPage() {
 
       case "Completed":
 
-        return "bg-green-100 text-green-700";
+        return "bg-green-100 text-green-700 border border-green-200";
 
       case "In Progress":
 
-        return "bg-yellow-100 text-yellow-700";
+        return "bg-yellow-100 text-yellow-700 border border-yellow-200";
 
       case "On Hold":
 
-        return "bg-red-100 text-red-700";
+        return "bg-red-100 text-red-700 border border-red-200";
 
       default:
 
-        return "bg-blue-100 text-blue-700";
+        return "bg-blue-100 text-blue-700 border border-blue-200";
     }
   }
 
@@ -183,7 +237,7 @@ export default function ClientPage() {
 
     if (progress >= 60) {
 
-      return "bg-blue-600";
+      return "bg-purple-600";
     }
 
     if (progress >= 30) {
@@ -197,40 +251,78 @@ export default function ClientPage() {
   if (loading) {
 
     return (
-      <div className="p-10">
-        Loading...
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+
+        <div className="bg-white px-8 py-6 rounded-2xl shadow text-lg font-semibold text-purple-600">
+
+          Loading dashboard...
+
+        </div>
+
       </div>
     );
   }
 
   return (
-    <div className="flex">
+    <div className="flex bg-gray-100">
 
       <Sidebar role="client" />
 
-      <main className="flex-1 min-h-screen bg-gray-100 p-6 md:p-10 pt-24 md:pt-10">
+      <main className="flex-1 min-h-screen p-6 md:p-10 pt-24 md:pt-10">
 
         {/* HEADER */}
 
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-10">
+        <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6 mb-10">
 
           <div>
 
-            <h1 className="text-4xl font-bold text-purple-600">
+            <div className="flex items-center gap-3 mb-3">
+
+              <Sparkles className="text-purple-600" />
+
+              <span className="bg-purple-100 text-purple-700 px-4 py-1 rounded-full text-sm font-medium">
+
+                Client Portal
+
+              </span>
+
+            </div>
+
+            <h1 className="text-5xl font-bold text-purple-600">
 
               Client Dashboard
 
             </h1>
 
-            <p className="text-gray-600 mt-2">
+            <p className="text-gray-600 mt-3 text-lg">
 
-              Track your projects and monitor realtime progress
+              Monitor all project activities in realtime
 
             </p>
 
           </div>
 
-          <LogoutButton />
+          <div className="flex items-center gap-4">
+
+            <div className="bg-white px-5 py-3 rounded-2xl shadow text-sm text-gray-600 flex items-center gap-2">
+
+              <CalendarDays size={18} />
+
+              {new Date().toLocaleDateString(
+                "en-US",
+                {
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                }
+              )}
+
+            </div>
+
+            <LogoutButton />
+
+          </div>
 
         </div>
 
@@ -238,117 +330,187 @@ export default function ClientPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-10">
 
-          <div className="bg-white rounded-2xl shadow p-6">
+          <StatsCard
+            title="Total Projects"
+            value={stats.total}
+            icon={
+              <FolderKanban className="text-purple-600" />
+            }
+          />
 
-            <div className="flex items-center justify-between">
+          <StatsCard
+            title="In Progress"
+            value={stats.inProgress}
+            icon={
+              <TrendingUp className="text-yellow-500" />
+            }
+          />
 
-              <div>
+          <StatsCard
+            title="Completed"
+            value={stats.completed}
+            icon={
+              <CheckCircle2 className="text-green-600" />
+            }
+          />
 
-                <p className="text-gray-500 mb-2">
+          <StatsCard
+            title="Pending"
+            value={stats.pending}
+            icon={
+              <Clock3 className="text-blue-600" />
+            }
+          />
 
-                  Total Projects
+        </div>
 
-                </p>
+        {/* ANALYTICS */}
 
-                <h2 className="text-4xl font-bold text-purple-600">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-10">
+
+          <div className="xl:col-span-2 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-3xl p-8 text-white shadow-xl">
+
+            <div className="flex items-center gap-3 mb-6">
+
+              <Activity />
+
+              <h2 className="text-2xl font-bold">
+
+                Project Overview
+
+              </h2>
+
+            </div>
+
+            <p className="text-purple-100 leading-relaxed text-lg mb-8">
+
+              Your projects are continuously monitored with realtime progress tracking and live updates from technicians and administrators.
+
+            </p>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+
+              <div className="bg-white/10 backdrop-blur rounded-2xl p-5">
+
+                <h3 className="text-3xl font-bold">
 
                   {stats.total}
 
-                </h2>
+                </h3>
 
-              </div>
+                <p className="text-purple-100 mt-2">
 
-              <FolderKanban
-                className="text-purple-600"
-                size={34}
-              />
-
-            </div>
-
-          </div>
-
-          <div className="bg-white rounded-2xl shadow p-6">
-
-            <div className="flex items-center justify-between">
-
-              <div>
-
-                <p className="text-gray-500 mb-2">
-
-                  In Progress
+                  Projects
 
                 </p>
 
-                <h2 className="text-4xl font-bold text-yellow-600">
-
-                  {stats.inProgress}
-
-                </h2>
-
               </div>
 
-              <Activity
-                className="text-yellow-600"
-                size={34}
-              />
+              <div className="bg-white/10 backdrop-blur rounded-2xl p-5">
 
-            </div>
+                <h3 className="text-3xl font-bold">
 
-          </div>
+                  {stats.completed}
 
-          <div className="bg-white rounded-2xl shadow p-6">
+                </h3>
 
-            <div className="flex items-center justify-between">
-
-              <div>
-
-                <p className="text-gray-500 mb-2">
+                <p className="text-purple-100 mt-2">
 
                   Completed
 
                 </p>
 
-                <h2 className="text-4xl font-bold text-green-600">
+              </div>
 
-                  {stats.completed}
+              <div className="bg-white/10 backdrop-blur rounded-2xl p-5">
 
-                </h2>
+                <h3 className="text-3xl font-bold">
+
+                  {stats.inProgress}
+
+                </h3>
+
+                <p className="text-purple-100 mt-2">
+
+                  Active
+
+                </p>
 
               </div>
 
-              <CheckCircle2
-                className="text-green-600"
-                size={34}
-              />
+              <div className="bg-white/10 backdrop-blur rounded-2xl p-5">
 
-            </div>
+                <h3 className="text-3xl font-bold">
 
-          </div>
+                  {stats.pending}
 
-          <div className="bg-white rounded-2xl shadow p-6">
+                </h3>
 
-            <div className="flex items-center justify-between">
-
-              <div>
-
-                <p className="text-gray-500 mb-2">
+                <p className="text-purple-100 mt-2">
 
                   Pending
 
                 </p>
 
-                <h2 className="text-4xl font-bold text-blue-600">
-
-                  {stats.pending}
-
-                </h2>
-
               </div>
 
-              <Clock3
-                className="text-blue-600"
-                size={34}
-              />
+            </div>
+
+          </div>
+
+          {/* CHART */}
+
+          <div className="bg-white rounded-3xl shadow p-6">
+
+            <h2 className="text-2xl font-bold text-purple-600 mb-6">
+
+              Status Analytics
+
+            </h2>
+
+            <div className="h-[320px]">
+
+              <ResponsiveContainer
+                width="100%"
+                height="100%"
+              >
+
+                <PieChart>
+
+                  <Pie
+                    data={chartData}
+                    dataKey="value"
+                    nameKey="name"
+                    outerRadius={110}
+                    label
+                  >
+
+                    {chartData.map(
+                      (
+                        entry,
+                        index
+                      ) => (
+
+                        <Cell
+                          key={index}
+                          fill={
+                            COLORS[
+                              index %
+                                COLORS.length
+                            ]
+                          }
+                        />
+
+                      )
+                    )}
+
+                  </Pie>
+
+                  <Tooltip />
+
+                </PieChart>
+
+              </ResponsiveContainer>
 
             </div>
 
@@ -363,9 +525,24 @@ export default function ClientPage() {
           {projects.length ===
             0 && (
 
-            <div className="bg-white p-10 rounded-2xl shadow text-center text-gray-500 lg:col-span-2">
+            <div className="bg-white p-12 rounded-3xl shadow text-center text-gray-500 lg:col-span-2">
 
-              No projects assigned yet
+              <FolderKanban
+                className="mx-auto mb-4 text-gray-400"
+                size={50}
+              />
+
+              <h2 className="text-2xl font-bold mb-2">
+
+                No Projects Yet
+
+              </h2>
+
+              <p>
+
+                Your assigned projects will appear here.
+
+              </p>
 
             </div>
 
@@ -378,7 +555,7 @@ export default function ClientPage() {
 
               <div
                 key={project.id}
-                className="bg-white rounded-2xl shadow p-7"
+                className="bg-white rounded-3xl shadow hover:shadow-2xl transition-all duration-300 p-7 border border-gray-100"
               >
 
                 {/* TOP */}
@@ -389,10 +566,14 @@ export default function ClientPage() {
 
                     <div className="flex items-center gap-3 mb-3">
 
-                      <FolderKanban
-                        className="text-purple-600"
-                        size={24}
-                      />
+                      <div className="bg-purple-100 p-3 rounded-2xl">
+
+                        <FolderKanban
+                          className="text-purple-600"
+                          size={22}
+                        />
+
+                      </div>
 
                       <h2 className="text-2xl font-bold text-gray-800">
 
@@ -413,7 +594,7 @@ export default function ClientPage() {
                   </div>
 
                   <span
-                    className={`px-4 py-2 rounded-full text-sm font-medium w-fit ${getStatusStyle(
+                    className={`px-4 py-2 rounded-full text-sm font-semibold w-fit ${getStatusStyle(
                       project.status
                     )}`}
                   >
@@ -428,11 +609,11 @@ export default function ClientPage() {
 
                 <div className="mb-7">
 
-                  <div className="flex justify-between mb-2">
+                  <div className="flex justify-between mb-3">
 
                     <span className="font-semibold text-gray-700">
 
-                      Project Progress
+                      Progress
 
                     </span>
 
@@ -441,8 +622,7 @@ export default function ClientPage() {
                       {
                         project.progress ||
                         0
-                      }
-                      %
+                      }%
 
                     </span>
 
@@ -451,7 +631,7 @@ export default function ClientPage() {
                   <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
 
                     <div
-                      className={`h-4 rounded-full transition-all duration-500 ${getProgressColor(
+                      className={`h-4 rounded-full transition-all duration-700 ${getProgressColor(
                         project.progress ||
                           0
                       )}`}
@@ -471,7 +651,7 @@ export default function ClientPage() {
 
                 <div className="border-t pt-6 mb-6">
 
-                  <div className="flex items-center gap-2 mb-3">
+                  <div className="flex items-center gap-2 mb-4">
 
                     <FileText
                       className="text-purple-600"
@@ -486,7 +666,7 @@ export default function ClientPage() {
 
                   </div>
 
-                  <p className="text-gray-600 whitespace-pre-wrap text-sm leading-relaxed">
+                  <p className="text-gray-600 whitespace-pre-wrap text-sm leading-relaxed bg-gray-50 p-4 rounded-2xl">
 
                     {
                       project.contract_details
@@ -514,7 +694,7 @@ export default function ClientPage() {
 
                   </div>
 
-                  <div className="text-sm font-medium text-purple-600">
+                  <div className="bg-purple-100 text-purple-700 px-4 py-2 rounded-xl text-sm font-medium">
 
                     Live tracking enabled
 
@@ -530,6 +710,45 @@ export default function ClientPage() {
         </div>
 
       </main>
+
+    </div>
+  );
+}
+
+function StatsCard({
+  title,
+  value,
+  icon,
+}: any) {
+
+  return (
+    <div className="bg-white rounded-3xl shadow hover:shadow-xl transition-all p-6 border border-gray-100">
+
+      <div className="flex items-center justify-between">
+
+        <div>
+
+          <p className="text-gray-500 mb-2 font-medium">
+
+            {title}
+
+          </p>
+
+          <h2 className="text-4xl font-bold text-gray-800">
+
+            {value}
+
+          </h2>
+
+        </div>
+
+        <div className="bg-gray-100 p-4 rounded-2xl text-3xl">
+
+          {icon}
+
+        </div>
+
+      </div>
 
     </div>
   );
