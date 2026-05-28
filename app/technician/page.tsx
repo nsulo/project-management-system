@@ -13,6 +13,9 @@ import {
   CheckCircle2,
   Clock3,
   FolderKanban,
+  Activity,
+  Briefcase,
+  TrendingUp,
 } from "lucide-react";
 
 import { supabase } from "@/lib/supabase";
@@ -134,9 +137,9 @@ export default function TechnicianPage() {
     if (!error && data) {
 
       setProjects(
-  (data ||
-    []) as unknown as AssignedProject[]
-);
+        (data ||
+          []) as unknown as AssignedProject[]
+      );
     }
 
     setLoading(false);
@@ -328,6 +331,36 @@ export default function TechnicianPage() {
     return "bg-blue-100 text-blue-700";
   }
 
+  const completedProjects =
+    projects.filter(
+      (item) =>
+        item.projects?.status?.toLowerCase() ===
+        "completed"
+    ).length;
+
+  const activeProjects =
+    projects.filter(
+      (item) =>
+        item.projects?.status?.toLowerCase() !==
+        "completed"
+    ).length;
+
+  const averageProgress =
+    projects.length > 0
+      ? Math.round(
+          projects.reduce(
+            (
+              acc,
+              item
+            ) =>
+              acc +
+              (item.projects
+                ?.progress || 0),
+            0
+          ) / projects.length
+        )
+      : 0;
+
   if (loading) {
 
     return (
@@ -344,6 +377,8 @@ export default function TechnicianPage() {
 
       <main className="flex-1 min-h-screen bg-gray-100 p-6 md:p-10 pt-24 md:pt-10">
 
+        {/* HEADER */}
+
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-10">
 
           <div>
@@ -356,13 +391,61 @@ export default function TechnicianPage() {
 
             <p className="text-gray-600 mt-2">
 
-              Manage assigned projects and submit progress reports
+              Track assignments, submit reports and monitor project progress
 
             </p>
 
           </div>
 
-          <LogoutButton />
+          <div className="flex items-center gap-4">
+
+            <div className="bg-white px-5 py-3 rounded-xl shadow text-sm text-gray-600">
+
+              {new Date().toLocaleDateString(
+                "en-US",
+                {
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                }
+              )}
+
+            </div>
+
+            <LogoutButton />
+
+          </div>
+
+        </div>
+
+        {/* STATS */}
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+
+          <StatCard
+            title="Assigned Projects"
+            value={projects.length}
+            icon={
+              <Briefcase className="text-green-600" />
+            }
+          />
+
+          <StatCard
+            title="Completed"
+            value={completedProjects}
+            icon={
+              <CheckCircle2 className="text-blue-600" />
+            }
+          />
+
+          <StatCard
+            title="Average Progress"
+            value={`${averageProgress}%`}
+            icon={
+              <TrendingUp className="text-yellow-500" />
+            }
+          />
 
         </div>
 
@@ -370,20 +453,30 @@ export default function TechnicianPage() {
 
           {/* REPORT FORM */}
 
-          <div className="bg-white rounded-2xl shadow p-8">
+          <div className="bg-white rounded-3xl shadow-lg p-8 h-fit">
 
-            <div className="flex items-center gap-3 mb-6">
+            <div className="flex items-center gap-3 mb-8">
 
               <FileText
                 className="text-green-600"
-                size={30}
+                size={32}
               />
 
-              <h2 className="text-2xl font-bold text-green-600">
+              <div>
 
-                Submit Report
+                <h2 className="text-2xl font-bold text-green-600">
 
-              </h2>
+                  Submit Report
+
+                </h2>
+
+                <p className="text-gray-500 text-sm">
+
+                  Update project progress
+
+                </p>
+
+              </div>
 
             </div>
 
@@ -391,19 +484,19 @@ export default function TechnicianPage() {
               onSubmit={
                 submitReport
               }
-              className="space-y-5"
+              className="space-y-6"
             >
 
               <div>
 
-                <label className="block mb-2 font-semibold">
+                <label className="block mb-2 font-semibold text-gray-700">
 
                   Select Project
 
                 </label>
 
                 <select
-                  className="w-full border p-3 rounded-xl"
+                  className="w-full border border-gray-200 p-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-green-500"
                   value={
                     selectedProject
                   }
@@ -449,7 +542,7 @@ export default function TechnicianPage() {
 
               <div>
 
-                <label className="block mb-2 font-semibold">
+                <label className="block mb-2 font-semibold text-gray-700">
 
                   Work Report
 
@@ -457,7 +550,7 @@ export default function TechnicianPage() {
 
                 <textarea
                   rows={6}
-                  className="w-full border p-4 rounded-xl"
+                  className="w-full border border-gray-200 p-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="Describe completed work..."
                   value={
                     reportText
@@ -473,38 +566,48 @@ export default function TechnicianPage() {
 
               <div>
 
-                <label className="block mb-2 font-semibold">
+                <label className="block mb-2 font-semibold text-gray-700">
 
-                  Project Progress %
+                  Project Progress
 
                 </label>
 
-                <input
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={progress}
-                  onChange={(e) =>
-                    setProgress(
-                      Number(
-                        e.target.value
+                <div className="flex items-center gap-4">
+
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={progress}
+                    onChange={(e) =>
+                      setProgress(
+                        Number(
+                          e.target.value
+                        )
                       )
-                    )
-                  }
-                  className="w-full border p-3 rounded-xl"
-                />
+                    }
+                    className="w-full accent-green-600"
+                  />
+
+                  <span className="font-bold text-green-600 w-14">
+
+                    {progress}%
+
+                  </span>
+
+                </div>
 
               </div>
 
               <div>
 
-                <label className="block mb-2 font-semibold">
+                <label className="block mb-2 font-semibold text-gray-700">
 
                   Upload Image
 
                 </label>
 
-                <div className="border-2 border-dashed border-gray-300 rounded-xl p-5">
+                <div className="border-2 border-dashed border-gray-300 rounded-2xl p-6">
 
                   <input
                     type="file"
@@ -536,7 +639,7 @@ export default function TechnicianPage() {
                 disabled={
                   submitting
                 }
-                className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl transition-all disabled:opacity-50"
+                className="w-full bg-green-600 hover:bg-green-700 text-white py-4 rounded-2xl transition-all font-semibold disabled:opacity-50"
               >
 
                 {submitting
@@ -558,7 +661,7 @@ export default function TechnicianPage() {
               {projects.length ===
                 0 && (
 
-                <div className="bg-white rounded-2xl shadow p-8 text-center text-gray-500">
+                <div className="bg-white rounded-3xl shadow p-10 text-center text-gray-500">
 
                   No assigned projects
 
@@ -579,18 +682,18 @@ export default function TechnicianPage() {
                       key={
                         item.id
                       }
-                      className="bg-white rounded-2xl shadow p-6"
+                      className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all p-7"
                     >
 
-                      <div className="flex items-start justify-between gap-4 mb-5">
+                      <div className="flex items-start justify-between gap-4 mb-6">
 
                         <div>
 
-                          <div className="flex items-center gap-2 mb-2">
+                          <div className="flex items-center gap-2 mb-3">
 
                             <FolderKanban
                               className="text-green-600"
-                              size={20}
+                              size={22}
                             />
 
                             <h2 className="text-2xl font-bold text-gray-800">
@@ -603,7 +706,7 @@ export default function TechnicianPage() {
 
                           </div>
 
-                          <p className="text-gray-600">
+                          <p className="text-gray-600 leading-relaxed">
 
                             {
                               project.description
@@ -614,7 +717,7 @@ export default function TechnicianPage() {
                         </div>
 
                         <span
-                          className={`px-4 py-2 rounded-full text-sm font-medium capitalize ${getStatusColor(
+                          className={`px-4 py-2 rounded-full text-sm font-medium capitalize whitespace-nowrap ${getStatusColor(
                             project.status
                           )}`}
                         >
@@ -629,7 +732,7 @@ export default function TechnicianPage() {
 
                       <div className="mb-6">
 
-                        <div className="flex justify-between text-sm mb-2">
+                        <div className="flex justify-between text-sm mb-3">
 
                           <span className="font-medium text-gray-700">
 
@@ -647,10 +750,10 @@ export default function TechnicianPage() {
 
                         </div>
 
-                        <div className="w-full bg-gray-200 rounded-full h-3">
+                        <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
 
                           <div
-                            className="bg-green-600 h-3 rounded-full transition-all"
+                            className="bg-green-600 h-4 rounded-full transition-all duration-500"
                             style={{
                               width: `${project.progress || 0}%`,
                             }}
@@ -678,7 +781,7 @@ export default function TechnicianPage() {
 
                       </div>
 
-                      <div className="flex items-center gap-2 text-sm text-green-600">
+                      <div className="flex items-center gap-2 text-sm text-green-600 font-medium">
 
                         {project.status.toLowerCase() ===
                         "completed" ? (
@@ -711,6 +814,41 @@ export default function TechnicianPage() {
         </div>
 
       </main>
+
+    </div>
+  );
+}
+
+function StatCard({
+  title,
+  value,
+  icon,
+}: any) {
+
+  return (
+    <div className="bg-white p-6 rounded-3xl shadow-lg hover:shadow-xl transition-all">
+
+      <div className="flex items-center justify-between mb-4">
+
+        <div className="text-3xl">
+
+          {icon}
+
+        </div>
+
+        <h2 className="text-4xl font-bold text-gray-800">
+
+          {value}
+
+        </h2>
+
+      </div>
+
+      <p className="text-gray-600 font-medium">
+
+        {title}
+
+      </p>
 
     </div>
   );
