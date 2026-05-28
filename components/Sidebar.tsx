@@ -1,4 +1,5 @@
 "use client";
+
 //import Image from "next/image";
 
 import {
@@ -8,7 +9,10 @@ import {
 
 import Link from "next/link";
 
-import { usePathname } from "next/navigation";
+import {
+  usePathname,
+  useRouter,
+} from "next/navigation";
 
 import {
   Menu,
@@ -24,9 +28,12 @@ import {
   BarChart3,
   MessageSquare,
   History,
+  LogOut,
 } from "lucide-react";
 
 import { supabase } from "@/lib/supabase";
+
+import { signOut } from "@/services/auth";
 
 type SidebarProps = {
   role: "admin" | "technician" | "client";
@@ -35,6 +42,9 @@ type SidebarProps = {
 export default function Sidebar({
   role,
 }: SidebarProps) {
+
+  const router =
+    useRouter();
 
   const [open, setOpen] =
     useState(false);
@@ -108,6 +118,18 @@ export default function Sidebar({
     };
 
   }, []);
+
+  async function handleLogout() {
+
+    await signOut();
+
+    document.cookie =
+      "user-role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+
+    router.push("/login");
+
+    router.refresh();
+  }
 
   async function fetchUnreadNotifications() {
 
@@ -231,7 +253,6 @@ export default function Sidebar({
 
         <div className="flex items-center gap-3">
 
-          
           <h2 className="text-lg font-bold text-blue-600">
 
             ADE PMP
@@ -274,7 +295,7 @@ export default function Sidebar({
           fixed md:static top-0 left-0 z-40
           w-64 min-h-screen bg-white shadow-xl p-6
           transform transition-transform duration-300
-          overflow-y-auto
+          overflow-y-auto flex flex-col
           ${
             open
               ? "translate-x-0"
@@ -287,7 +308,7 @@ export default function Sidebar({
 
         <div className="flex flex-col items-center mb-10 mt-10 md:mt-0">
 
-                   <h2 className="text-2xl font-extrabold text-blue-600 mt-4 text-center">
+          <h2 className="text-2xl font-extrabold text-blue-600 mt-4 text-center">
 
             ADE PMP
 
@@ -301,7 +322,7 @@ export default function Sidebar({
 
         </div>
 
-        <nav className="space-y-3">
+        <nav className="space-y-3 flex-1">
 
           {/* ADMIN */}
 
@@ -685,6 +706,19 @@ export default function Sidebar({
           )}
 
         </nav>
+
+        {/* Logout Button */}
+
+        <button
+          onClick={handleLogout}
+          className="mt-8 flex items-center justify-center gap-3 bg-red-500 hover:bg-red-600 text-white px-4 py-3 rounded-xl transition-all w-full"
+        >
+
+          <LogOut size={20} />
+
+          Logout
+
+        </button>
 
       </aside>
     </>
