@@ -285,8 +285,24 @@ export default function AdminDashboard() {
   if (loading) {
 
     return (
-      <div className="p-10">
-        Loading...
+      <div className="flex">
+
+        <Sidebar role="admin" />
+
+        <main className="flex-1 min-h-screen bg-gray-100 flex items-center justify-center">
+
+          <div className="bg-white px-8 py-6 rounded-2xl shadow-lg">
+
+            <p className="text-lg font-semibold text-blue-600 animate-pulse">
+
+              Loading dashboard...
+
+            </p>
+
+          </div>
+
+        </main>
+
       </div>
     );
   }
@@ -300,17 +316,17 @@ export default function AdminDashboard() {
 
         {/* HEADER */}
 
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5 mb-10">
 
           <div>
 
-            <h1 className="text-4xl font-bold text-blue-600">
+            <h1 className="text-4xl md:text-5xl font-extrabold text-blue-600 tracking-tight">
 
               Admin Dashboard
 
             </h1>
 
-            <p className="text-gray-600 mt-2">
+            <p className="text-gray-600 mt-3 text-lg">
 
               Welcome back to ADE Project Management System
 
@@ -318,9 +334,9 @@ export default function AdminDashboard() {
 
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
 
-            <div className="bg-white px-5 py-3 rounded-xl shadow text-sm text-gray-600">
+            <div className="bg-white px-5 py-3 rounded-2xl shadow text-sm text-gray-600 border">
 
               {new Date().toLocaleDateString(
                 "en-US",
@@ -342,7 +358,7 @@ export default function AdminDashboard() {
 
         {/* STATS */}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6 mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-6 mb-10">
 
           <DashboardCard
             title="Projects"
@@ -352,6 +368,7 @@ export default function AdminDashboard() {
                 className="text-blue-600"
               />
             }
+            bg="bg-blue-50"
           />
 
           <DashboardCard
@@ -362,6 +379,7 @@ export default function AdminDashboard() {
                 className="text-green-600"
               />
             }
+            bg="bg-green-50"
           />
 
           <DashboardCard
@@ -374,6 +392,7 @@ export default function AdminDashboard() {
                 className="text-yellow-500"
               />
             }
+            bg="bg-yellow-50"
           />
 
           <DashboardCard
@@ -384,6 +403,7 @@ export default function AdminDashboard() {
                 className="text-purple-600"
               />
             }
+            bg="bg-purple-50"
           />
 
           <DashboardCard
@@ -394,6 +414,7 @@ export default function AdminDashboard() {
                 className="text-orange-600"
               />
             }
+            bg="bg-orange-50"
           />
 
         </div>
@@ -402,13 +423,29 @@ export default function AdminDashboard() {
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-10">
 
-          <div className="bg-white p-6 rounded-2xl shadow">
+          {/* MONTHLY PROJECTS */}
 
-            <h2 className="text-2xl font-bold text-blue-600 mb-6">
+          <div className="bg-white p-6 rounded-3xl shadow-lg border border-gray-100">
 
-              Monthly Projects
+            <div className="flex items-center justify-between mb-6">
 
-            </h2>
+              <div>
+
+                <h2 className="text-2xl font-bold text-blue-600">
+
+                  Monthly Projects
+
+                </h2>
+
+                <p className="text-gray-500 text-sm mt-1">
+
+                  Projects created over time
+
+                </p>
+
+              </div>
+
+            </div>
 
             <div className="h-[350px]">
 
@@ -435,8 +472,8 @@ export default function AdminDashboard() {
                     dataKey="projects"
                     fill="#2563eb"
                     radius={[
-                      8,
-                      8,
+                      10,
+                      10,
                       0,
                       0,
                     ]}
@@ -450,13 +487,25 @@ export default function AdminDashboard() {
 
           </div>
 
-          <div className="bg-white p-6 rounded-2xl shadow">
+          {/* STATUS */}
 
-            <h2 className="text-2xl font-bold text-blue-600 mb-6">
+          <div className="bg-white p-6 rounded-3xl shadow-lg border border-gray-100">
 
-              Project Status
+            <div className="mb-6">
 
-            </h2>
+              <h2 className="text-2xl font-bold text-blue-600">
+
+                Project Status
+
+              </h2>
+
+              <p className="text-gray-500 text-sm mt-1">
+
+                Current project distribution
+
+              </p>
+
+            </div>
 
             <div className="h-[350px]">
 
@@ -514,17 +563,31 @@ export default function AdminDashboard() {
 
         {/* RECENT PROJECTS */}
 
-        <div className="bg-white rounded-2xl shadow p-6">
+        <div className="bg-white rounded-3xl shadow-lg p-6 border border-gray-100">
 
           <div className="flex items-center gap-3 mb-6">
 
-            <Activity className="text-blue-600" />
+            <div className="bg-blue-100 p-3 rounded-xl">
 
-            <h2 className="text-2xl font-bold text-blue-600">
+              <Activity className="text-blue-600" />
 
-              Recent Projects
+            </div>
 
-            </h2>
+            <div>
+
+              <h2 className="text-2xl font-bold text-blue-600">
+
+                Recent Projects
+
+              </h2>
+
+              <p className="text-gray-500 text-sm">
+
+                Latest project activity
+
+              </p>
+
+            </div>
 
           </div>
 
@@ -534,17 +597,17 @@ export default function AdminDashboard() {
 
               <thead>
 
-                <tr className="border-b text-left">
+                <tr className="border-b text-left text-gray-600">
 
-                  <th className="pb-3">
+                  <th className="pb-4 font-semibold">
                     Project
                   </th>
 
-                  <th className="pb-3">
+                  <th className="pb-4 font-semibold">
                     Status
                   </th>
 
-                  <th className="pb-3">
+                  <th className="pb-4 font-semibold">
                     Created
                   </th>
 
@@ -559,18 +622,31 @@ export default function AdminDashboard() {
 
                     <tr
                       key={project.id}
-                      className="border-b hover:bg-gray-50 transition"
+                      className="border-b hover:bg-gray-50 transition-all"
                     >
 
-                      <td className="py-4 font-medium">
+                      <td className="py-5 font-semibold text-gray-800">
 
                         {project.title}
 
                       </td>
 
-                      <td className="py-4">
+                      <td className="py-5">
 
-                        <span className="px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-700">
+                        <span
+                          className={`
+                            px-4 py-2 rounded-full text-sm font-semibold
+                            ${
+                              project.status === "Completed"
+                                ? "bg-green-100 text-green-700"
+                                : project.status === "In Progress"
+                                ? "bg-blue-100 text-blue-700"
+                                : project.status === "Pending"
+                                ? "bg-yellow-100 text-yellow-700"
+                                : "bg-red-100 text-red-700"
+                            }
+                          `}
+                        >
 
                           {project.status}
 
@@ -578,7 +654,7 @@ export default function AdminDashboard() {
 
                       </td>
 
-                      <td className="py-4 text-gray-500">
+                      <td className="py-5 text-gray-500">
 
                         {new Date(
                           project.created_at
@@ -609,18 +685,23 @@ function DashboardCard({
   title,
   value,
   icon,
+  bg,
 }: any) {
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition-all">
+    <div className="bg-white p-6 rounded-3xl shadow-lg border border-gray-100 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
 
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-5">
 
-        <div className="text-3xl">
-          {icon}
+        <div className={`${bg} p-4 rounded-2xl`}>
+
+          <div className="text-3xl">
+            {icon}
+          </div>
+
         </div>
 
-        <h2 className="text-4xl font-bold text-gray-800">
+        <h2 className="text-4xl font-extrabold text-gray-800">
 
           {value}
 
@@ -628,7 +709,7 @@ function DashboardCard({
 
       </div>
 
-      <p className="text-gray-600 font-medium">
+      <p className="text-gray-600 font-semibold text-lg">
 
         {title}
 
