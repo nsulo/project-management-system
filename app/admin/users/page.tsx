@@ -60,11 +60,6 @@ export default function AdminUsersPage() {
   ] = useState("");
 
   const [
-  editEmail,
-  setEditEmail,
-] = useState("");
-
-  const [
     editRole,
     setEditRole,
   ] = useState("client");
