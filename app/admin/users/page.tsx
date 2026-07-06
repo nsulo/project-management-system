@@ -216,99 +216,74 @@ export default function AdminUsersPage() {
   }
 
   function startEdit(
-  user: UserType
-) {
+    user: UserType
+  ) {
 
-  setEditingUser(user);
+    setEditingUser(user);
 
-  setEditFullName(
-    user.full_name
-  );
+    setEditFullName(
+      user.full_name
+    );
 
-  setEditEmail(
-    user.email
-  );
-
-  setEditRole(
-    user.role
-  );
-
-}
+    setEditRole(user.role);
+  }
 
   async function handleUpdateUser(
-  e: React.FormEvent
-) {
+    e: React.FormEvent
+  ) {
 
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!editingUser) return;
+    if (!editingUser) return;
 
-  try {
+    try {
 
-    setUpdating(true);
+      setUpdating(true);
 
-    const response =
-      await fetch(
-        "/api/admin/update-user",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type":
-              "application/json",
-          },
-          body: JSON.stringify({
-            id: editingUser.id,
+      const { error } =
+        await supabase
+          .from("profiles")
+          .update({
             full_name:
               editFullName,
-            email: editEmail,
             role: editRole,
-          }),
-        }
+          })
+          .eq(
+            "id",
+            editingUser.id
+          );
+
+      if (error) {
+
+        alert(error.message);
+
+        setUpdating(false);
+
+        return;
+      }
+
+      await logActivity(
+        "User Updated",
+        `Updated user: ${editFullName}`
       );
 
-    const result =
-      await response.json();
+      alert(
+        "User updated successfully"
+      );
 
-    if (!response.ok) {
+      setEditingUser(null);
 
-      alert(result.error);
+      fetchUsers();
 
-      return;
+    } catch (err) {
 
+      console.error(err);
+
+    } finally {
+
+      setUpdating(false);
     }
-
-    await logActivity(
-      "User Updated",
-      `Updated user: ${editFullName}`
-    );
-
-    alert(
-      "User updated successfully."
-    );
-
-    setEditingUser(null);
-
-    fetchUsers();
-
   }
-
-  catch (err) {
-
-    console.error(err);
-
-    alert(
-      "Something went wrong."
-    );
-
-  }
-
-  finally {
-
-    setUpdating(false);
-
-  }
-
-}
 
   async function handleDeleteUser(
     id: string,
@@ -421,24 +396,25 @@ export default function AdminUsersPage() {
 
               <div>
 
-  <label className="block mb-2 font-medium">
+                <label className="block mb-2 font-medium">
 
-    Email
+                  Email
 
-  </label>
+                </label>
 
-  <input
-    type="email"
-    value={editEmail}
-    onChange={(e) =>
-      setEditEmail(
-        e.target.value
-      )
-    }
-    className="w-full border p-3 rounded-xl"
-  />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) =>
+                    setEmail(
+                      e.target.value
+                    )
+                  }
+                  className="w-full border p-3 rounded-xl"
+                  placeholder="Enter email"
+                />
 
-</div>
+              </div>
 
               <div>
 
