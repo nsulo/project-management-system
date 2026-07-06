@@ -173,16 +173,20 @@ export default function AdminUsersPage() {
 
       if (data.user) {
 
-        await supabase
-          .from("profiles")
-          .upsert({
-            id: data.user.id,
-            full_name:
-              fullName,
-            email,
-            role,
-          });
+        const { error: profileError } = await supabase
+  .from("profiles")
+  .upsert({
+    id: data.user.id,
+    full_name: fullName,
+    email,
+    role,
+  });
 
+if (profileError) {
+  console.error(profileError);
+  alert(profileError.message);
+  return;
+}
         await logActivity(
           "User Created",
           `Created ${role}: ${fullName}`
