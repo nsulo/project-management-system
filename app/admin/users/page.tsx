@@ -84,36 +84,30 @@ export default function AdminUsersPage() {
     try {
       setCreating(true);
 
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: fullName,
-            role,
-          },
-        },
-      });
+      const response = await fetch("/api/create-user", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    email,
+    password,
+    fullName,
+    role,
+  }),
+});
 
-      if (error) {
-        alert(error.message);
-        setCreating(false);
-        return;
-      }
+const result = await response.json();
 
-      if (data.user) {
-        await supabase.from("profiles").upsert({
-          id: data.user.id,
-          full_name: fullName,
-          email,
-          role,
-        });
-
-        await logActivity(
-          "User Created",
-          `Created ${role}: ${fullName}`
-        );
-      }
+if (!response.ok) {
+  alert(result.error);
+  setCreating(false);
+  return;
+}
+      await logActivity(
+  "User Created",
+  `Created ${role}: ${fullName}`
+);
 
       alert("User created successfully");
 

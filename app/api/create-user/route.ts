@@ -35,8 +35,9 @@ export async function POST(req: Request) {
         .insert({
           id: user.id,
           full_name: fullName,
+          email,
           role,
-        });
+});
 
     if (profileError) {
       return NextResponse.json(
